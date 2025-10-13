@@ -1,0 +1,90 @@
+
+@import 'ngx-toastr/toastr';
+
+
+
+.toast-container {
+  position: fixed;
+  z-index: 999999;
+}
+
+.toast-top-right {
+  top: 70px !important;
+  right: 12px !important;
+}
+
+.toast {
+  opacity: 1 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  margin-bottom: 10px !important;
+  min-height: 60px !important;
+}
+
+.toast-success {
+  background-color: #28a745 !important;
+}
+
+.toast-error {
+  background-color: #dc3545 !important;
+}
+
+.toast-info {
+  background-color: #17a2b8 !important;
+}
+
+.toast-warning {
+  background-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+.btn-group .btn {
+    margin: 0 2px;
+}
+
+
+th {
+    user-select: none;
+}
+
+th:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+
+.input-group {
+    max-width: 400px;
+}
+
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+}
+
+
+.btn-primary {
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-wrap: wrap;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 5px;
+    }
+    
+}
+

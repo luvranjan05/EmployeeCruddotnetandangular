@@ -13,5 +13,12 @@ namespace employeeBackend.Model
         public int Age { get; set; }
         public decimal Salary { get; set; }
         public bool Status { get; set; }
+
+        public string CreatedBy { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public string UpdatedBy { get; set; } = string.Empty;
+        public DateTime UpdatedAt { get; set; }
+
+
     }
 }

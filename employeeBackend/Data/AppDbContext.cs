@@ -1,4 +1,5 @@
-﻿using employeeBackend.Model;
+﻿
+using employeeBackend.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace employeeBackend.Data
@@ -10,6 +11,7 @@ namespace employeeBackend.Data
         }
 
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<User> Users { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,9 +30,31 @@ namespace employeeBackend.Data
                       .IsRequired()
                       .HasMaxLength(100);
                 entity.Property(e => e.Salary)
-                      .HasColumnType("decimal(18,2)"); // Fix the decimal warning
+                      .HasColumnType("decimal(18,2)");
                 entity.Property(e => e.Age);
                 entity.Property(e => e.Status);
+
+                entity.Property(e => e.CreatedBy)
+                     .IsRequired()
+                     .HasMaxLength(100);
+                entity.Property(e => e.CreatedAt)
+                      .IsRequired();
+                entity.Property(e => e.UpdatedBy)
+                      .IsRequired()
+                      .HasMaxLength(100);
+                entity.Property(e => e.UpdatedAt)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.UserName)
+                      .IsRequired()
+                      .HasMaxLength(100);
+                entity.Property(u => u.Password)
+                      .IsRequired();
+                entity.HasIndex(u => u.UserName).IsUnique(); 
             });
         }
     }

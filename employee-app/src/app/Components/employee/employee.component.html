@@ -1,0 +1,273 @@
+<div class="container-fluid shadow-sm">
+  <div class="row bg-primary text-white align-items-center py-3 px-4">
+    
+    <div class="col-md-6 col-12 mb-2 mb-md-0 d-flex align-items-center">
+      <i class="fas fa-users me-2 fs-4"></i>
+      <h3 class="mb-0 fw-semibold">Employee Management</h3>
+    </div>
+
+    <div class="col-md-6 col-12 text-md-end text-center">
+      <div class="d-inline-block me-3">
+        <i class="fas fa-user-circle me-1 fs-5"></i>
+         <span 
+          class="badge ms-2 py-1 px-2 rounded-pill me-2"
+          [ngClass]="isAdmin() ? 'bg-success text-dark' : 'bg-secondary'"
+        >
+          {{ isAdmin() ? 'ADMIN' : 'USER' }}
+        </span>
+        <strong>{{ currentUser?.username }}</strong>
+       
+      </div>
+
+      <button 
+        *ngIf="isAdmin()" 
+        class="btn btn-light text-primary fw-semibold me-2"
+        (click)="openModel()"
+      >
+        <i class="fas fa-plus me-1"></i> Add Employee
+      </button>
+
+      <button 
+        class="btn btn-outline-light fw-semibold"
+        (click)="logout()"
+      >
+        <i class="fas fa-sign-out-alt me-1"></i> Logout
+      </button>
+    </div>
+  </div>
+   
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search employees..." 
+                       [(ngModel)]="searchTerm" (input)="onSearch()">
+                <span class="input-group-text">
+                    🔍
+                </span>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <small class="text-muted">
+                Showing {{paginatedEmployees.length}} of {{filteredEmployees.length}} employees
+            </small>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="bg-secondary text-white">
+            <tr>
+                <th (click)="sort('id')" style="cursor: pointer;">
+                    ID {{getSortIcon('id')}}
+                </th>
+                <th (click)="sort('firstName')" style="cursor: pointer;">
+                    First Name {{getSortIcon('firstName')}}
+                </th>
+                <th (click)="sort('lastName')" style="cursor: pointer;">
+                    Last Name {{getSortIcon('lastName')}}
+                </th>
+                <th (click)="sort('emailId')" style="cursor: pointer;">
+                    Email {{getSortIcon('emailId')}}
+                </th>
+                <th (click)="sort('age')" style="cursor: pointer;">
+                    Age {{getSortIcon('age')}}
+                </th>
+                <th (click)="sort('salary')" style="cursor: pointer;">
+                    Salary {{getSortIcon('salary')}}
+                </th>
+                <th (click)="sort('status')" style="cursor: pointer;">
+                    Status {{getSortIcon('status')}}
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let emp of paginatedEmployees">
+                <td>{{emp.id}}</td>
+                <td>{{emp.firstName}}</td>
+                <td>{{emp.lastName}}</td>
+                <td>{{emp.emailId}}</td>
+                <td>{{emp.age}}</td>
+                <td>{{emp.salary | currency:'USD':'symbol':'1.0-0'}}</td>
+                <td>
+                    <span [class]="emp.status ? 'badge bg-success' : 'badge bg-danger'">
+                        {{emp.status ? 'Active' : 'Inactive'}}
+                    </span>
+                </td>
+               
+                <td>
+  <button *ngIf="isAdmin()" class="btn btn-info btn-sm me-1" (click)="openModel(emp)">Update</button>
+  <button *ngIf="isAdmin()" class="btn btn-danger btn-sm" (click)="deleteEmployee(emp.id)">Delete</button>
+  <span *ngIf="!isAdmin()" class="text-muted">View Only</span>
+</td>
+            </tr>
+            <tr *ngIf="paginatedEmployees.length === 0">
+                <td colspan="8" class="text-center text-muted">
+                    No employees found
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="btn-group">
+                <button class="btn btn-outline-primary btn-sm" 
+                        (click)="previousPage()" 
+                        [disabled]="currentPage === 1">
+                    ← Previous
+                </button>
+                
+                <button *ngFor="let page of pageNumbers" 
+                        class="btn btn-sm" 
+                        [class.btn-primary]="page === currentPage"
+                        [class.btn-outline-primary]="page !== currentPage"
+                        (click)="goToPage(page)">
+                    {{page}}
+                </button>
+                
+                <button class="btn btn-outline-primary btn-sm" 
+                        (click)="nextPage()" 
+                        [disabled]="currentPage === totalPages">
+                    Next →
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="btn-group">
+                <span class="btn btn-outline-secondary btn-sm disabled">
+                    Page {{currentPage}} of {{totalPages}}
+                </span>
+                <select class="form-select form-select-sm" style="width: auto;" 
+                        [(ngModel)]="pageSize" (change)="currentPage = 1; applyFilterAndSort()">
+                    <option value="5">5</option>
+                    <option value="10">10 </option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="showModal" class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{isEditMode ? 'Edit' : 'Add'}} Employee</h5>
+                <button type="button" class="btn-close" (click)="closeModel()"></button>
+            </div>
+            
+            <div class="modal-body">
+                <form #employeeForm="ngForm">
+                   
+                    <div class="mb-3">
+                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" 
+                               [class.is-invalid]="isFieldInvalid(firstName)"
+                               [(ngModel)]="selectedEmployee.firstName" 
+                               name="firstName" required minlength="2" #firstName="ngModel">
+                        <div *ngIf="isFieldInvalid(firstName)" class="invalid-feedback">
+                            <div *ngIf="firstName.errors?.['required']">First Name is required</div>
+                            <div *ngIf="firstName.errors?.['minlength']">First Name must be at least 2 characters</div>
+                        </div>
+                    </div>
+
+                 
+                    <div class="mb-3">
+                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" 
+                               [class.is-invalid]="isFieldInvalid(lastName)"
+                               [(ngModel)]="selectedEmployee.lastName" 
+                               name="lastName" required minlength="2" #lastName="ngModel">
+                        <div *ngIf="isFieldInvalid(lastName)" class="invalid-feedback">
+                            <div *ngIf="lastName.errors?.['required']">Last Name is required</div>
+                            <div *ngIf="lastName.errors?.['minlength']">Last Name must be at least 2 characters</div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="mb-3">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" 
+                               [class.is-invalid]="isFieldInvalid(emailId)"
+                               [(ngModel)]="selectedEmployee.emailId" 
+                               name="emailId" required email #emailId="ngModel">
+                        <div *ngIf="isFieldInvalid(emailId)" class="invalid-feedback">
+                            {{getEmailError(emailId)}}
+                        </div>
+                    </div>
+
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Age <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" 
+                               [class.is-invalid]="isFieldInvalid(age)"
+                               [(ngModel)]="selectedEmployee.age" 
+                               name="age" required min="18" max="65" #age="ngModel">
+                        <div *ngIf="isFieldInvalid(age)" class="invalid-feedback">
+                            {{getAgeError(age)}}
+                        </div>
+                    </div>
+
+                
+                    <div class="mb-3">
+                        <label class="form-label">Salary <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" 
+                               [class.is-invalid]="isFieldInvalid(salary)"
+                               [(ngModel)]="selectedEmployee.salary" 
+                               name="salary" required min="0" #salary="ngModel">
+                        <div *ngIf="isFieldInvalid(salary)" class="invalid-feedback">
+                            {{getSalaryError(salary)}}
+                        </div>
+                    </div>
+
+                
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="statusCheck" 
+                               [(ngModel)]="selectedEmployee.status" name="status">
+                        <label class="form-check-label" for="statusCheck">Active</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeModel()">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="saveEmployee()">
+                    {{isEditMode ? 'Update' : 'Save'}}
+                </button>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+
+<div class="container mt-1 mb-3">
+  <div class="row justify-content-center g-2">
+    <div class="col-md-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h5 class="card-title text-primary">About Employee App</h5>
+          <p class="card-text text-muted">
+            Manage employees efficiently with powerful tools to add, edit, search, and organize staff details.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h5 class="card-title text-success">Designed by Peace ❤️</h5>
+          <p class="card-text text-muted mb-0">
+            &copy; 2025 Employee App — All Rights Reserved.
+          </p>
+          <div class="mt-2">
+            <a href="#" class="btn btn-outline-secondary btn-sm me-2">Privacy Policy</a>
+            <a href="#" class="btn btn-outline-secondary btn-sm">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+/* Modal Styles */
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+  max-width: 500px;
+}
+
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+/* Button Styles */
+.btn {
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Table Styles */
+.table {
+  margin-top: 20px;
+}
+
+.badge {
+  font-size: 0.8em;
+}
+
+/* Form Styles */
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.text-danger {
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+
+.bg-primary {
+  background: linear-gradient(90deg, #007bff, #0056d2);
+}
+
+.btn-light:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.02);
+  transition: 0.2s;
+}

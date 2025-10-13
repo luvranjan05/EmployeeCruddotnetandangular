@@ -1,5 +1,6 @@
 ﻿using employeeBackend.Model;
 using employeeBackend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace employeeBackend.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] 
     public class EmployeeController : ControllerBase
     {
         private readonly EployeeRepository emp;
@@ -16,6 +18,7 @@ namespace employeeBackend.Controller
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult> EmployeeList()
         {
             var allEmployees = await emp.GetAllEmployees();
@@ -23,6 +26,7 @@ namespace employeeBackend.Controller
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous] 
         public async Task<ActionResult> GetEmployee(int id)
         {
             var employee = await emp.GetEmployeeById(id);
@@ -31,6 +35,7 @@ namespace employeeBackend.Controller
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult> AddEmployee(Employee vm)
         {
             var newEmployee = await emp.SaveEmployee(vm);
@@ -38,6 +43,7 @@ namespace employeeBackend.Controller
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult> UpdateEmployee(int id, Employee vm)
         {
             if (id != vm.Id) return BadRequest();
@@ -47,6 +53,7 @@ namespace employeeBackend.Controller
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")] 
         public async Task<ActionResult> DeleteEmployee(int id)
         {
             var result = await emp.DeleteEmployee(id);
