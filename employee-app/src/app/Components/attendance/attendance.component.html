@@ -1,0 +1,262 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-calendar-check me-2"></i>
+            Attendance System
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h5>Welcome, {{ currentUser()?.username }}</h5>
+              <p class="text-muted mb-0">Working Hours: 9:30 AM - 6:30 PM</p>
+            </div>
+            <div class="col-md-6 text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <button 
+                  class="btn btn-success" 
+                  (click)="checkIn()"
+                  [disabled]="todayAttendance()?.checkIn">
+                  <i class="fas fa-sign-in-alt me-1"></i>
+                  Check In
+                </button>
+                <button 
+                  class="btn btn-warning" 
+                  (click)="checkOut()"
+                  [disabled]="!todayAttendance()?.checkIn || todayAttendance()?.checkOut">
+                  <i class="fas fa-sign-out-alt me-1"></i>
+                  Check Out
+                </button>
+                <button class="btn btn-secondary" (click)="navigateToEmployees()">
+                  <i class="fas fa-arrow-left me-1"></i>
+                  Back to Employees
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Time Remaining</h6>
+        </div>
+        <div class="card-body text-center">
+          <h2 class="display-4 text-primary">{{ countdown() }}</h2>
+          <div class="progress mt-3" style="height: 10px;">
+            <div 
+              class="progress-bar bg-success" 
+              role="progressbar" 
+              [style.width.%]="workProgress()">
+            </div>
+          </div>
+          <small class="text-muted">{{ workProgress().toFixed(1) }}% of workday completed</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h6 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Today's Attendance</h6>
+        </div>
+        <div class="card-body">
+          <div *ngIf="todayAttendance(); else noAttendance" class="text-center">
+            <div class="row">
+              <div class="col-6">
+                <strong>Check In:</strong>
+                <p class="h5 text-success">{{ formatTime(todayAttendance()!.checkIn) }}</p>
+              </div>
+              <div class="col-6">
+                <strong>Check Out:</strong>
+                <p class="h5 text-warning">{{ formatTime(todayAttendance()!.checkOut) || 'Not checked out' }}</p>
+              </div>
+            </div>
+            <div *ngIf="todayAttendance()!.workDuration" class="mt-2">
+              <strong>Work Duration:</strong>
+              <p class="h6 text-primary">{{ todayAttendance()!.workDuration }}</p>
+            </div>
+          </div>
+          <ng-template #noAttendance>
+            <p class="text-center text-muted">No attendance recorded for today</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form [formGroup]="attendanceForm">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Month</label>
+                <select formControlName="selectedMonth" class="form-select" (change)="onMonthYearChange()">
+                  <option *ngFor="let month of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="month">
+                    {{ month }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Year</label>
+                <select formControlName="selectedYear" class="form-select" (change)="onMonthYearChange()">
+                  <option *ngFor="let year of [2024,2025]" [value]="year">{{ year }}</option>
+                </select>
+              </div>
+              <div *ngIf="isAdmin()" class="col-md-4">
+                <label class="form-label">Search User or Date</label>
+                <div class="input-group">
+                  <input 
+                    type="text" 
+                    formControlName="searchUser"
+                    class="form-control" 
+                    placeholder="Search by username or date...">
+                  <button 
+                    *ngIf="attendanceForm.get('searchUser')?.value"
+                    type="button" 
+                    class="btn btn-outline-secondary" 
+                    (click)="clearSearch()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+      
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="mb-0"><i class="fas fa-calendar me-2"></i>Attendance Calendar - {{ currentMonth() }}/{{ currentYear() }}</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" class="text-center">
+                    {{ day }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let week of getCalendarWeeks()">
+                  <td *ngFor="let day of week" class="text-center p-2" 
+                      [class.bg-light]="!day?.isCurrentMonth"
+                      [class.cursor-pointer]="day?.isCurrentMonth"
+                      (click)="day?.isCurrentMonth && selectDate(day.dateString)">
+                    <div *ngIf="day">
+                      <div class="fw-bold">{{ day.day }}</div>
+                      <div *ngIf="day.attendance" 
+                           [class]="'badge ' + getStatusClass(day.attendance) + ' mt-1'">
+                        {{ getStatusText(day.attendance) }}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="selectedDate()" class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Attendance Details - {{ selectedDate() }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getAttendanceForDate(selectedDate()!); else noData" class="row">
+            <div class="col-md-4">
+              <strong>Check In:</strong>
+              <p>{{ formatTime(getAttendanceForDate(selectedDate()!)!.checkIn) }}</p>
+            </div>
+            <div class="col-md-4">
+              <strong>Check Out:</strong>
+              <p>{{ formatTime(getAttendanceForDate(selectedDate()!)!.checkOut) }}</p>
+            </div>
+            <div class="col-md-4">
+              <strong>Work Duration:</strong>
+              <p>{{ getAttendanceForDate(selectedDate()!)!.workDuration || 'N/A' }}</p>
+            </div>
+          </div>
+          <ng-template #noData>
+            <p class="text-center text-muted">No attendance data for this date</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h6 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            Attendance Records 
+            <span *ngIf="selectedUser()" class="badge bg-info ms-2">
+              Filtered: {{ selectedUser() }} ({{ filteredAttendance().length }} records)
+            </span>
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>User</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Work Duration</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of filteredAttendance()">
+                  <td>{{ record.date }}</td>
+                  <td>{{ record.userName }}</td>
+                  <td>{{ formatTime(record.checkIn) }}</td>
+                  <td>{{ formatTime(record.checkOut) }}</td>
+                  <td>{{ record.workDuration || 'N/A' }}</td>
+                  <td>
+                    <span [class]="'badge ' + getStatusClass(record)">
+                      {{ getStatusText(record) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredAttendance().length === 0">
+                  <td colspan="6" class="text-center text-muted">
+                    No attendance records found
+                    <span *ngIf="selectedUser()"> for "{{ selectedUser() }}"</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

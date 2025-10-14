@@ -11,7 +11,8 @@ namespace employeeBackend.Data
         }
 
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<User> Users { get; set; } 
+        public DbSet<User> Users { get; set; }
+        public DbSet<Attendance> Attendance { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,6 +56,14 @@ namespace employeeBackend.Data
                 entity.Property(u => u.Password)
                       .IsRequired();
                 entity.HasIndex(u => u.UserName).IsUnique(); 
+            });
+
+            modelBuilder.Entity<Attendance>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.UserName).IsRequired().HasMaxLength(100);
+                entity.Property(a => a.Date).IsRequired();
+                entity.HasIndex(a => new { a.UserName, a.Date }).IsUnique();
             });
         }
     }

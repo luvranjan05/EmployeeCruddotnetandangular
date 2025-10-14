@@ -13,6 +13,9 @@
   right: 12px !important;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
 .toast {
   opacity: 1 !important;
   border-radius: 8px !important;

@@ -16,6 +16,9 @@
           {{ isAdmin() ? 'ADMIN' : 'USER' }}
         </span>
         <strong>{{ currentUser?.username }}</strong>
+       <button class="btn btn-info text-white fw-semibold me-2" (click)="navigateToAttendance()">
+  <i class="fas fa-calendar-check me-1"></i> Attendance
+</button>
        
       </div>
 

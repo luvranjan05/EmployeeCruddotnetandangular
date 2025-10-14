@@ -18,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<EployeeRepository>();
+builder.Services.AddScoped<AttendanceRepository>();
 builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

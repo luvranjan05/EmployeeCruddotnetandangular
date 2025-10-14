@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../Services/employee.service';
@@ -30,19 +30,20 @@ export class EmployeeComponent implements OnInit {
   sortDirection: 'asc' | 'desc' = 'asc';
   currentUser: any;
 
-  constructor(
-    private employeeService: EmployeeService,
-    private authService: AuthService,
-    private router: Router,
-    private toastr: ToastrService
-    
-  ) {}
+  private employeeService = inject(EmployeeService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.loadEmployees();
   }
 
+
+  navigateToAttendance(): void {
+    this.router.navigate(['/attendance']);
+  }
 
   loadEmployees(): void {
     this.employeeService.getEmployees().subscribe({
@@ -57,18 +58,15 @@ export class EmployeeComponent implements OnInit {
     });
   }
 
-
   isAdmin(): boolean {
     return this.authService.isAdmin();
   }
-
 
   logout(): void {
     this.authService.logout();
     this.toastr.success('Logged out successfully');
     this.router.navigate(['/login']);
   }
-
 
   openModel(employee?: Employee): void {
     this.isEditMode = !!employee;
@@ -92,7 +90,6 @@ export class EmployeeComponent implements OnInit {
       status: true
     };
   }
-
 
   saveEmployee(): void {
     if (this.isEditMode) {
@@ -122,7 +119,6 @@ export class EmployeeComponent implements OnInit {
     }
   }
 
-
   deleteEmployee(id: number): void {
     if (confirm('Are you sure you want to delete this employee?')) {
       this.employeeService.deleteEmployee(id).subscribe({
@@ -138,7 +134,6 @@ export class EmployeeComponent implements OnInit {
     }
   }
 
-
   onSearch(): void {
     this.currentPage = 1;
     this.applyFilterAndSort();
@@ -150,7 +145,6 @@ export class EmployeeComponent implements OnInit {
       emp.lastName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       emp.emailId.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
-
 
     if (this.sortColumn) {
       filtered.sort((a, b) => {
@@ -173,7 +167,6 @@ export class EmployeeComponent implements OnInit {
     this.updatePagination();
   }
 
-
   sort(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -188,7 +181,6 @@ export class EmployeeComponent implements OnInit {
     if (this.sortColumn !== column) return '↕️';
     return this.sortDirection === 'asc' ? '↑' : '↓';
   }
-
 
   updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredEmployees.length / this.pageSize);
@@ -217,7 +209,6 @@ export class EmployeeComponent implements OnInit {
     this.currentPage = page;
     this.updatePagination();
   }
-
 
   isFieldInvalid(field: any): boolean {
     return field.invalid && (field.dirty || field.touched);
