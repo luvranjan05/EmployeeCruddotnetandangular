@@ -1,8 +1,7 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../Services/auth.service';
-import { Router } from '@angular/router';
+import { AuthStore } from './auth.store';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -12,27 +11,13 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
 
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  public authStore = inject(AuthStore); 
   private toastr = inject(ToastrService);
 
-
-  isLoginMode = signal(true);
-  isLoading = signal(false);
-  
-
-  modeText = computed(() => 
-    this.isLoginMode() ? 'Login' : 'Register'
-  );
-  
-
-  toggleButtonText = computed(() =>
-    this.isLoginMode() ? "Don't have an account? Register" : 'Already have an account? Login'
-  );
-
+ 
   authForm!: FormGroup;
 
   ngOnInit(): void {
@@ -46,9 +31,9 @@ export class AuthComponent {
     });
   }
 
+
   toggleMode(): void {
-  
-    this.isLoginMode.set(!this.isLoginMode());  //set initial signal values like login will open first
+    this.authStore.toggleMode();
     this.authForm.reset();
   }
 
@@ -59,33 +44,8 @@ export class AuthComponent {
       return;
     }
 
-
-    this.isLoading.set(true);  //set metthod jisse signal update ho jaye
     const userData = this.authForm.value;
-
-    const authRequest = this.isLoginMode()
-      ? this.authService.login(userData)
-      : this.authService.register(userData);
-
-    authRequest.subscribe({
-      next: (res) => {
-
-        this.isLoading.set(false);
-        if (this.isLoginMode()) {
-          this.toastr.success('Login successful!');
-          this.router.navigate(['/employee']);
-        } else {
-          this.toastr.success('Registration successful! Please log in.');
-          this.isLoginMode.set(true);
-          this.authForm.reset();
-        }
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        const errorMsg = err.error?.message || 'Something went wrong. Please try again.';
-        this.toastr.error(errorMsg);
-      }
-    });
+    this.authStore.authenticate(userData);
   }
 
   isInvalid(controlName: string): boolean {

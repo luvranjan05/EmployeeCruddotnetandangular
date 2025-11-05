@@ -18,3 +18,114 @@
 input.is-invalid {
   border-color: #dc3545;
 }
+/* auth.component.css */
+
+/* Container */
+.auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px 25px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Heading */
+.auth-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #333;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #5a67d8; /* purple-blue */
+  box-shadow: 0 0 5px rgba(90, 103, 216, 0.5);
+  outline: none;
+}
+
+/* Invalid input styling */
+.form-group input.invalid {
+  border-color: #e53e3e;
+}
+
+.error {
+  color: #e53e3e;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 12px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary {
+  background-color: #5a67d8;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #434190;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-link {
+  margin-top: 15px;
+  text-align: center;
+  background: none;
+  border: none;
+  color: #5a67d8;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #434190;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 20px 15px;
+  }
+  .btn {
+    font-size: 15px;
+    padding: 10px 0;
+  }
+}
+
