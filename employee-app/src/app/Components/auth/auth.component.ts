@@ -12,7 +12,17 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit { private fb =inject(FormBuilder);
+
+
+
+  
   public authStore = inject(AuthStore); 
+
+
+
+
+
+
   private toastr = inject(ToastrService)     ;
   authForm!: FormGroup;
 
