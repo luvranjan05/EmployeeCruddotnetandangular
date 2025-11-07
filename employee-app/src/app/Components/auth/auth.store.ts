@@ -17,7 +17,23 @@ export class AuthStore {
   } as const;
 
   public readonly $isLoginMode = this.state.$isLoginMode.asReadonly();
+
+
+
+
+
+
+
+
   public readonly $isLoading = this.state.$isLoading.asReadonly();
+
+
+
+
+
+
+
+  
   public readonly $error = this.state.$error.asReadonly();
 
   public readonly $modeText = computed(() => 
