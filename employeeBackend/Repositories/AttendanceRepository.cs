@@ -1,6 +1,8 @@
 ﻿using employeeBackend.Data;
 using employeeBackend.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace employeeBackend.Repositories
 {
@@ -41,6 +43,7 @@ namespace employeeBackend.Repositories
         {
             var today = DateTime.Today;
             var attendance = await _db.Attendance
+
                 .FirstOrDefaultAsync(a => a.UserName == username && a.Date == today);
 
             if (attendance == null || !attendance.CheckIn.HasValue || attendance.CheckOut.HasValue)
@@ -49,10 +52,12 @@ namespace employeeBackend.Repositories
             attendance.CheckOut = DateTime.Now;
             attendance.WorkDuration = attendance.CheckOut - attendance.CheckIn;
             attendance.UpdatedAt = DateTime.UtcNow;
-
             await _db.SaveChangesAsync();
             return true;
         }
+
+
+
 
         public async Task<List<Attendance>> GetUserAttendance(string username, int month, int year)
         {
