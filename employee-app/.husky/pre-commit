@@ -1,7 +1,4 @@
-
-@"
-#!/usr/bin/env sh
-. \"`$(dirname \"`$0\")/_/husky.sh\"
+﻿#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
 npx lint-staged
-"@ | Out-File -FilePath ".husky/pre-commit" -Encoding UTF8
